@@ -9,7 +9,7 @@
 	
 	<body>
 		<script type="text/javascript">
-			var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+			var game = new Phaser.Game(800, 700, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 			
 			function preload()
 			{
@@ -73,7 +73,7 @@
 				element.scale.y = 44.6;
 				element = balken.create(100, 155, 'element');
 				element.body.immovable = true;
-				element.scale.y = 45;
+				element.scale.y = 44;
 				
 				// Punkte
 				punkte = game.add.group();
@@ -89,7 +89,7 @@
 					}
 				}
 				
-				scoreText = game.add.text(5, 550, 'Score: 0', {fontSize: '32px', fill: '#fff'});	
+				scoreText = game.add.text(30, 630, 'Score: 0', {fontSize: '32px', fill: '#fff'});	
 				
 				// Keyboardsteuerung
 				cursors = game.input.keyboard.createCursorKeys();
