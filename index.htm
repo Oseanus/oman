@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+	<head>
+		<title>OMan</title>
+		<script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+		
+		<link type="text/css" href="resources/main.css" />
+	</head>
+	
+	<body>
+		<script type="text/javascript">
+			var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+			
+			function preload()
+			{
+				game.load.spritesheet('oman', 'images/logo_klein_sprite_skaliert.png', 37.5, 37.5); // OMan Sprite laden				
+				game.load.image('quer', 'images/querbalken.png', 800, 5); // Querbalken laden
+				game.load.image('laengs', 'images/laengsbalken.png', 5, 600); // Längsbalken laden
+				game.load.image('element', 'images/strukturelement.png')
+				game.load.image('punkt', 'images/punkt.png', 10, 10);
+			}
+			
+			var oman;
+			var cursors;
+			var balken;
+			var punkte;
+			var frame;
+			var score = 0;
+			var scoretext;
+			
+			function create()
+			{
+			//	game.stage.backgroundColor = "#0c9fc7";
+				
+				// OMan Sprite
+				game.physics.startSystem(Phaser.Physics.ARCADE);
+				oman = game.add.sprite(10, 10, 'oman');
+				game.physics.arcade.enable(oman);
+				oman.body.gravity.y = 0;
+				oman.body.gravity.x = 0;
+				oman.animations.add('left', [0, 1], 10, true); // Animation für Linksbewegung
+				oman.animations.add('right', [2, 3], 10, true); // Animation für Rechtsbewegung
+				oman.animations.add('up', [4, 5], 10, true); // Animation für Bewgung nach oben
+				oman.animations.add('down', [6, 7], 10, true); // Animation für Bewegung nach unten
+				
+				// Balken
+				balken = game.add.group();
+				balken.enableBody = true;
+				var boden = balken.create(0, 590, 'quer');
+				boden.body.immovable = true;
+				var oben = balken.create(0, 0, 'quer');
+				oben.body.immovable = true;
+				var links = balken.create(0, 0, 'laengs');
+				links.body.immovable = true;
+				var rechts = balken.create(790, 0, 'laengs');
+				rechts.body.immovable = true;
+				
+				// Labyrinthstruktur
+				var element = balken.create(10, 47.5, 'element');
+				element.body.immovable = true;
+				element.scale.x = 10;
+				element = balken.create(148.5, 10, 'element');
+				element.body.immovable = true;
+				element.scale.y = 9;
+				element = balken.create(49, 96, 'element');
+				element.body.immovable = true;
+				element.scale.x = 10.9;
+				element = balken.create(10, 145, 'element');
+				element.body.immovable = true;
+				element.scale.x = 10;
+				element = balken.create(148.5, 105, 'element');
+				element.body.immovable = true;
+				element.scale.y = 44.6;
+				element = balken.create(100, 155, 'element');
+				element.body.immovable = true;
+				element.scale.y = 45;
+				
+				// Punkte
+				punkte = game.add.group();
+				punkte.enableBody = true;
+				
+				for(var i = 0; i < 15; i++)
+				{
+					for(var j = 0; j < 14; j++)
+					{
+						var punkt = punkte.create(185 + (i * 40), 30 + (j * 40), 'punkt');
+						punkt.body.gravity.x = 0;
+						punkt.body.gravity.y = 0;
+					}
+				}
+				
+				scoreText = game.add.text(5, 550, 'Score: 0', {fontSize: '32px', fill: '#fff'});	
+				
+				// Keyboardsteuerung
+				cursors = game.input.keyboard.createCursorKeys();
+			}
+			
+			function update()
+			{
+				// OMan kollidiert mit einem Element der Balken-Gruppe
+				game.physics.arcade.collide(oman, balken);
+				
+				game.physics.arcade.overlap(oman, punkte, collectPoint, null, this);
+				
+				// OMan bleibt stehen
+				oman.body.velocity.x = 0;
+				oman.body.velocity.y = 0;
+				
+				// Pfeiltasten vom Keyboard
+				// Begriffe sind selbsterklärend
+				if(cursors.left.isDown)
+				{
+					oman.body.velocity.x = -100;
+					oman.animations.play('left');
+					frame = 'left';
+				}
+				else if(cursors.right.isDown)
+				{
+					oman.body.velocity.x = 100;
+					oman.animations.play('right');
+					frame = 'right';
+				}
+				else if(cursors.up.isDown)
+				{
+					oman.body.velocity.y = -100;
+					oman.animations.play('up');
+					frame = 'up';
+				}
+				else if(cursors.down.isDown)
+				{
+					oman.body.velocity.y = 100;
+					oman.animations.play('down');
+					frame = 'down';
+				}
+				/*else
+				{
+					game.animations.stop();
+					
+					switch(frame)
+					{
+						case 'left':
+							oman.frame = 0;
+							break;
+						case 'right':
+							oman.frame = 2;
+							break;
+						case 'up':
+							oman.frame = 4;
+							break;
+						case 'right':
+							oman.frame = 6;
+							break;
+					}
+				}*/
+			}
+			
+			// OMan frisst einen Punkt
+			function collectPoint(player, point)
+            {
+                point.kill(); // Berührten Punkt entfernen
+                score += 1; // Score um 1 hochzählen
+                scoreText.text = 'Score: ' + score; // Scorestring
+            }
+		</script>
+	</body>
+</html>
